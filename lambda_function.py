@@ -9,18 +9,15 @@ def lambda_handler(event, context):
             "message": "Hello from Lambda!",
             "event": event
         }
+        sns_client.publish(
+            TopicArn='TEST_SNS_ARN',
+            Message='Lambda function triggered successfully!'
+        )
         return {
             "statusCode": 200,
             "body": json.dumps(body)
         }
-    elif 'Records' in event:
-        for record in event['Records']:
-            print(record)
-    sns_client.publish(
-        TopicArn='TEST_SNS_ARN',
-        Message='Lambda function triggered successfully!'
-    )
     return {
-        "statusCode": 200,
-        "body": "Lambda function executed successfully!"
+        "statusCode": 404,
+        "body": "Undefined action"
     }
