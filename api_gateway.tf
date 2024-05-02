@@ -1,40 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
-resource "aws_lambda_function" "http_trigger_lambda" {
-  function_name = "http-trigger-lambda"
-  handler       = "lambda_function.lambda_handler"
-  runtime       = "python3.8"
-  filename      = "lambda_function.zip"
-  role          = aws_iam_role.lambda_exec_role.arn
-  timeout       = 10
-}
-
-  resource "aws_iam_role" "lambda_exec_role" {
-    name = "lambda-exec-role"
-
-    assume_role_policy = jsonencode({
-      "Version": "2012-10-17",
-      "Statement": [
-        {
-          "Effect": "Allow",
-          "Principal": {
-            "Service": "lambda.amazonaws.com"
-          },
-          "Action": "sts:AssumeRole"
-        }
-      ]
-    })
-
-    managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonSNSFullAccess"]
-  }
-
-resource "aws_iam_role_policy_attachment" "lambda_execution_policy_attachment" {
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-  role       = aws_iam_role.lambda_exec_role.name
-}
-
 resource "aws_api_gateway_rest_api" "example" {
   name        = "example_api"
   description = "An example API"
@@ -106,7 +69,7 @@ resource "aws_lambda_permission" "apigateway_invoke_lambda" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.http_trigger_lambda.function_name
   principal     = "apigateway.amazonaws.com"
-source_arn    = "${aws_api_gateway_rest_api.example.execution_arn}/*/POST/example"
+  source_arn    = "${aws_api_gateway_rest_api.example.execution_arn}/*/POST/example"
 }
 
 output "api_gateway_url" {
